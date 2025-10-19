@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator, MinValueValidator
 
 class Customer(models.Model):
     name= models.CharField(max_length=100)
-    email=models.CharField(unique=True)
+    email=models.EmailField(unique=True)
     phone = models.CharField(
         max_length=20, 
         blank=True, 
