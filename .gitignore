@@ -1,11 +1,16 @@
-/venv
+# Ignore virtual environment
+venv/
+ENV/
+env/
 
 # Ignore environment variables file
 .env
 
 # Ignore Python cache files
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
 
 # Ignore OS-specific files
 .DS_Store
