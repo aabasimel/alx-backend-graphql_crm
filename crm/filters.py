@@ -48,11 +48,17 @@ class ProductFilter(django_filters.FilterSet):
 class OrderFilter(django_filters.FilterSet):
     total_amount_gte = django_filters.NumberFilter(field_name='total_amount', lookup_expr='gte')
     total_amount_lte = django_filters.NumberFilter(field_name='total_amount', lookup_expr='lte')
-    order_date_gte = django_filters.DateFilter(field_name='order_date', lookup_expr='gte')
-    order_date_lte = django_filters.DateFilter(field_name='order_date', lookup_expr='lte')
+    order_date_gte = django_filters.DateTimeFilter(field_name='order_date', lookup_expr='gte')
+    order_date_lte = django_filters.DateTimeFilter(field_name='order_date', lookup_expr='lte')
     customer_name = django_filters.CharFilter(field_name='customer__name', lookup_expr='icontains')
     product_name = django_filters.CharFilter(method='filter_product_name')
     product_id = django_filters.NumberFilter(method='filter_product_id')
+    order_by = django_filters.OrderingFilter(
+        fields=(
+            ('order_date', 'order_date'),
+            ('total_amount', 'total_amount'),
+        )
+    )
 
     class Meta:
         model = Order

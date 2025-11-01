@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from decimal import Decimal
 import random
-
+from datetime import datetime,timedelta
 from crm.models import Customer, Product, Order,OrderProduct
 
 
@@ -50,14 +50,26 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def _populate_orders(self, customers, products):
+
         statuses = [Order.StatusChoices.PENDING,
                 Order.StatusChoices.CONFIRMED,
                 Order.StatusChoices.CANCELLED]
+        
         for _ in range(5):
             customer = random.choice(customers)
             status=random.choice(statuses)
-            order = Order.objects.create(customer=customer,status=status)
+            days_ago = random.randint(7, 30)
+            order_date = datetime.now() - timedelta(days=days_ago)
+
+            order = Order.objects.create(
+            customer=customer,
+            status=status,
+            order_date=order_date  # assign the generated past date
+        )
+
+            
             selected_products = random.sample(products, random.randint(2, 4))
+
             for p in selected_products:
                 quantity=random.randint(1,5)
                 OrderProduct.objects.create(order=order,product=p,quantity=quantity)

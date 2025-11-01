@@ -14,3 +14,5 @@ typing_extensions==4.15.0
 tzdata==2025.2
 graphene_django
 django_cron
+gql
+requests
