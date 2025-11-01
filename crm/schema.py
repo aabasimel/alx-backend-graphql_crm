@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from decimal import Decimal
 import re
-from .models import Customer, Product, Order
+from .models import Customer, Product, Order,OrderProduct
 from .filters import CustomerFilter, ProductFilter, OrderFilter
 
 
@@ -48,11 +48,15 @@ class ProductInput(graphene.InputObjectType):
     stock = graphene.Int(default_value=0)
 
 
+class OrderProductInput(graphene.InputObjectType):
+    product_id=graphene.ID(required=True)
+    quantity=graphene.Int(default=1,required=True)
+
 class OrderInput(graphene.InputObjectType):
     customer_id = graphene.ID(required=True)
-    product_ids = graphene.List(graphene.ID, required=True)
+    products = graphene.List(OrderProductInput, required=True)
     order_date = graphene.DateTime()
-
+    status=graphene.String()
 
 # Helper function for phone validation
 def validate_phone(phone):
@@ -165,31 +169,35 @@ class CreateOrder(graphene.Mutation):
 
             if not input.product_ids:
                 raise ValidationError("At least one product is required")
-
-            products = []
-            total_amount = Decimal('0.00')
-
-            for product_id in input.product_ids:
-                try:
-                    product = Product.objects.get(pk=product_id)
-                    products.append(product)
-                    total_amount += product.price
-                except Product.DoesNotExist:
-                    raise ValidationError(f"Invalid product ID: {product_id}")
-
-            order = Order(
+            
+            order=Order(
                 customer=customer,
                 order_date=input.order_date,
-                total_amount=total_amount
+                status=input.status or Order.StatusChoices.PENDING
             )
+            
             order.save()
-            order.products.set(products)
+            total_amount = Decimal('0.00')
+
+            for item in input.products:
+                try:
+                    product = Product.objects.get(pk=item.product_id)
+                except Product.DoesNotExist:
+                    raise ValidationError(f"Invalid product ID: {item.product_id}")
+                OrderProduct.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=item.quantity
+                )
+                total_amount+=product.price*item.quantity
+            order.total_amount=total_amount
+            order.save(update_fields=['total_amount'])
 
             return CreateOrder(order=order)
         except ValidationError as e:
             raise Exception(str(e))
 
-
+            
 # Query with filtering support
 class Query(graphene.ObjectType):
     all_customers = DjangoFilterConnectionField(CustomerType, order_by=graphene.String())
