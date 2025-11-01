@@ -1,19 +1,25 @@
 
-import os
+import os,sys
 from gql import gql,Client
 from gql.transport.requests import RequestsHTTPTransport
 from datetime import datetime,timedelta
+import django
+
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'alx_backend_graphql.settings')
+django.setup()
 
 LOG_FILE="/tmp/order_reminders_log.txt"
 GRAPHQL_ENDPOINT=  "http://localhost:8000/graphql"
 
 
 def send_order_reminders():
-    one_week_ago=(datetime.now()-timedelta(days=7)).isoformat()
+    one_week_ago=(datetime.now()-timedelta(days=7)).strftime('%Y-%m-%d')
 
     query=gql("""
             query($since:DateTime!){
-              allOrders(orderBy:"order_date", filter:{status:"Pending",orderDate_Gte:$since}){
+              allOrders(orderDateGte:$since,orderBy:"order_date"){
                 edges{
                     node{
                         id
@@ -41,7 +47,7 @@ def send_order_reminders():
     with open(LOG_FILE, 'a') as f:
         for order_edge in orders:
             order=order_edge["node"]
-            log_line=f"{datetime.now().isoformat()}-Oder ID: {order[id]}, Customer: {order['customer']['email']}, Order Date: {order['orderDate']}\n"
+            log_line=f"{datetime.now().strftime('%Y-%m-%d')}-Oder ID: {order['id']}, Customer: {order['customer']['email']}, Order Date: {order['orderDate']}\n"
             f.write(log_line)
     print("Order reminders processed!")
 
