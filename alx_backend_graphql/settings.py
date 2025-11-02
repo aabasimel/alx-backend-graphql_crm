@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'crm',
     'django_filters',
     'django_cron',
+    'django_crontab',
 
 ]
 
