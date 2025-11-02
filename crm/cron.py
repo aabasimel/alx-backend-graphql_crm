@@ -39,7 +39,7 @@ def log_crm_heartbeat():
     except Exception as e:
         print(f"Error writing to the file {LOG_FILE}: {e}")
 
-LOW_STOCK_LOG_FILE = "/tmp/crm_heartbeat_log.txt"
+LOW_STOCK_LOG_FILE = "/tmp/low_stock_updates_log.txt"
 
 def update_low_stock():
     """Updates low stock products mutation via Graphql and los the products"""
