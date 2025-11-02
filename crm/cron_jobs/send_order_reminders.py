@@ -11,7 +11,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'alx_backend_graphql.settings')
 django.setup()
 
 LOG_FILE="/tmp/order_reminders_log.txt"
-GRAPHQL_ENDPOINT=  "http://localhost:8000/graphql"
+GRAPHQL_ENDPOINT = os.environ.get("GRAPHQL_ENDPOINT", "http://localhost:8000/graphql")
 
 
 def send_order_reminders():

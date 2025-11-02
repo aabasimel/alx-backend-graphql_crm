@@ -35,17 +35,19 @@ class Command(BaseCommand):
     @transaction.atomic
     def _populate_products(self):
         data = [
-            {"name": "Laptop", "price": Decimal("899.99"), "stock": 10},
-            {"name": "Smartphone", "price": Decimal("699.99"), "stock": 25},
-            {"name": "Headphones", "price": Decimal("149.99"), "stock": 40},
-            {"name": "Monitor", "price": Decimal("299.99"), "stock": 15},
-            {"name": "Keyboard", "price": Decimal("89.99"), "stock": 30},
+            {"name": "Laptop", "price": Decimal("899.99"), "stock": 1},
+            {"name": "Smartphone", "price": Decimal("699.99"), "stock": 3},
+            {"name": "Headphones", "price": Decimal("149.99"), "stock": 4},
+            {"name": "Monitor", "price": Decimal("299.99"), "stock": 9},
+            {"name": "Keyboard", "price": Decimal("89.99"), "stock": 3},
+            {"name": "mouse", "price": Decimal("20.99"), "stock": 3},
+
         ]
         products = []
         for p in data:
             obj, _ = Product.objects.get_or_create(name=p["name"], defaults=p)
             products.append(obj)
-        self.stdout.write(self.style.SUCCESS(f"Added {len(products)} products"))
+        self.stdout.write(self.style.SUCCESS(f"Added {len(products)} products stock:{p['stock']}"))
         return products
 
     @transaction.atomic

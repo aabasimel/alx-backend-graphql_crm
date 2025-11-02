@@ -8,6 +8,8 @@ from decimal import Decimal
 import re
 from .models import Customer, Product, Order,OrderProduct
 from .filters import CustomerFilter, ProductFilter, OrderFilter
+from django.db.models import F
+
 
 
 # Object Types with Node interface for filtering
@@ -197,6 +199,20 @@ class CreateOrder(graphene.Mutation):
         except ValidationError as e:
             raise Exception(str(e))
 
+class UpdateLowStockProducts(graphene.Mutation):
+    products=graphene.List(ProductType)
+    message=graphene.String()
+
+    @transaction.atomic
+    def mutate(self,info):
+        low_stock_products=list(Product.objects.filter(stock__lt=10).values_list('id',flat=True))
+        if not low_stock_products:
+            return UpdateLowStockProducts(products=[],message="No products require restocking")
+        Product.objects.filter(id__in=low_stock_products).update(stock=F('stock')+10)  
+        updated_stock=Product.objects.filter(id__in=low_stock_products)
+        message = f"Successfully restocked {len(updated_stock)} product(s)."
+
+        return UpdateLowStockProducts(products=updated_stock,message=message)
             
 # Query with filtering support
 class Query(graphene.ObjectType):
@@ -229,4 +245,6 @@ class Mutation(graphene.ObjectType):
     bulk_create_customers = BulkCreateCustomers.Field()
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
+    update_low_stock_products = UpdateLowStockProducts.Field()
+
 
