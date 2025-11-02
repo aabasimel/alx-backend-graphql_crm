@@ -9,6 +9,7 @@ import re
 from .models import Customer, Product, Order,OrderProduct
 from .filters import CustomerFilter, ProductFilter, OrderFilter
 from django.db.models import F
+from crm.models import Product
 
 
 

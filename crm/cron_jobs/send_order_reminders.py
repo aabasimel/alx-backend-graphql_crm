@@ -44,7 +44,7 @@ def send_order_reminders():
 
     result=client.execute(query,variable_values={"since": one_week_ago})
     orders=result.get("allOrders",{}).get("edges",[])
-    with open(LOG_FILE, 'a') as f:
+    with open("/tmp/order_reminders_log.txt", 'a') as f:
         for order_edge in orders:
             order=order_edge["node"]
             log_line=f"{datetime.now().strftime('%Y-%m-%d')}-Oder ID: {order['id']}, Customer: {order['customer']['email']}, Order Date: {order['orderDate']}\n"
