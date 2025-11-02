@@ -128,4 +128,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRONJOBS = [
     ('*/5 * * * *', 'crm.cron.log_crm_heartbeat'),
+    ('0 8 * * *', 'crm.cron_jobs.send_order_reminders.send_order_reminders')
 ]
