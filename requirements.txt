@@ -16,3 +16,5 @@ graphene_django
 django_cron
 gql
 requests
+requests-toolbelt
+django-crontab
